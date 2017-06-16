@@ -64,7 +64,7 @@ class ChargifyHttpClient(object):
         :param method: The HTTP method to use.
         :param data: Any POST data that should be included with the request.
         """
-        result = requests.request(method, url, params=params, data=data, auth=(api_key, 'X'))
+        result = requests.request(method, url, params=params, json=data, auth=(api_key, 'X'))
 
         if result.ok:
             if 'json' in result.headers.get('content-type'):
