@@ -1,5 +1,5 @@
 # encoding: utf-8
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 with open('README.md') as f:
@@ -21,7 +21,7 @@ setup(
     url='https://github.com/code-kitchen/chargify-python/',
     license=license,
     install_requires=requirements,
-    packages=['.'],
+    packages=find_packages(exclude=['test_*.py']),
     include_package_data=True,
     zip_safe=False,
     classifiers=(

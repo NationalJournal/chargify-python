@@ -2,6 +2,19 @@
 import requests
 
 
+__all__ = (
+    'ChargifyError',
+    'ChargifyConnectionError',
+    'ChargifyUnauthorizedError',
+    'ChargifyForbiddenError',
+    'ChargifyNotFoundError',
+    'ChargifyUnprocessableEntityError',
+    'ChargifyServerError',
+    'ChargifyHttpClient',
+    'Chargify',
+)
+
+
 class ChargifyError(Exception):
     pass
 
@@ -38,8 +51,8 @@ VERBS = {
     'delete': 'DELETE',
 }
 
-# A list of identifiers that should be extracted and placed into the url string if they are
-# passed into the kwargs.
+# A list of identifiers that should be extracted and placed into the url string
+# if they are passed into the kwargs.
 IDENTIFIERS = {
     'customer_id': 'customers',
     'product_id': 'products',
@@ -54,7 +67,8 @@ VALID_FORMATS = ['json', 'xml']
 
 class ChargifyHttpClient(object):
     """
-    Extracted from the main Chargify class so it can be stubbed out during testing.
+    Extracted from the main Chargify class so it can be stubbed out during
+    testing.
     """
 
     def make_request(self, method, url, params, data, api_key):
@@ -64,7 +78,8 @@ class ChargifyHttpClient(object):
         :param method: The HTTP method to use.
         :param data: Any POST data that should be included with the request.
         """
-        result = requests.request(method, url, params=params, json=data, auth=(api_key, 'X'))
+        result = requests.request(method, url, params=params, json=data,
+                                  auth=(api_key, 'X'))
 
         if result.ok:
             if 'json' in result.headers.get('content-type'):
@@ -96,7 +111,8 @@ class Chargify(object):
     client = None
     format = None
 
-    def __init__(self, api_key, sub_domain, path=None, client=None, format=None):
+    def __init__(self, api_key, sub_domain, path=None, client=None,
+                 format=None):
         """
         :param api_key: The API key for your Chargify account.
         :param sub_domain: The sub domain of your Chargify account.
@@ -120,19 +136,20 @@ class Chargify(object):
         try:
             return object.__getattr__(self, attr)
         except AttributeError:
-            return Chargify(self.api_key, self.sub_domain, self.path + [attr], self.client,
-                            format=self.format)
+            return Chargify(self.api_key, self.sub_domain, self.path + [attr],
+                            self.client, format=self.format)
 
     def construct_request(self, **kwargs):
         """
         :param kwargs: The arguments passed into the request. Valid values are:
-            'customer_id', 'product_id', 'subscription_id', 'component_id', 'handle' will be
-            extracted and placed into the url. 'data' will be serialized into a JSON string and
-            POSTed with the request.
+            'customer_id', 'product_id', 'subscription_id', 'component_id',
+            'handle' will be extracted and placed into the url. 'data' will be
+            serialized into a JSON string and POSTed with the request.
         """
         path = self.path[:]
 
-        # Find the HTTP method if we were called with create(), update(), read(), or delete()
+        # Find the HTTP method if we were called with create(), update(),
+        # read(), or delete()
         if path[-1] in VERBS.keys():
             action = path.pop()
             method = VERBS[action]
@@ -156,4 +173,5 @@ class Chargify(object):
 
     def __call__(self, **kwargs):
         method, url, params, data = self.construct_request(**kwargs)
-        return self.client.make_request(method, url, params, data, self.api_key)
+        return self.client.make_request(method, url, params, data,
+                                        self.api_key)
