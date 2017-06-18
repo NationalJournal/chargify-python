@@ -1,0 +1,12 @@
+language: python
+python:
+- 2.7
+- 3.5
+- 3.6
+env:
+- REQUESTS="requests<2.18"
+- REQUESTS="requests>=2.18,<2.19"
+install:
+- pip install -q $REQUESTS
+script:
+- python test_chargify.py
