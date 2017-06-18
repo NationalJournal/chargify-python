@@ -1,4 +1,3 @@
-# Adapted from: https://github.com/stevenwei/chargify-python
 import requests
 
 
@@ -59,6 +58,12 @@ IDENTIFIERS = {
     'subscription_id': 'subscriptions',
     'component_id': 'components',
     'handle': 'handle',
+    'statement_id': 'statements',
+    'product_family_id': 'product_families',
+    'coupon_id': 'coupons',
+    'transaction_id': 'transactions',
+    'usage_id': 'usages',
+    'migration_id': 'migrations',
 }
 
 # Valid response formats
