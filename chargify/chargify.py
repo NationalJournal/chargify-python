@@ -7,6 +7,7 @@ __all__ = (
     'ChargifyUnauthorizedError',
     'ChargifyForbiddenError',
     'ChargifyNotFoundError',
+    'ChargifyDuplicateSubmissionError',
     'ChargifyUnprocessableEntityError',
     'ChargifyServerError',
     'ChargifyHttpClient',
@@ -15,7 +16,12 @@ __all__ = (
 
 
 class ChargifyError(Exception):
-    pass
+    """
+    Base Charfigy error exception.
+    """
+    def __init__(self, error_data=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.error_data = error_data or {}
 
 
 class ChargifyConnectionError(ChargifyError):
@@ -34,6 +40,10 @@ class ChargifyNotFoundError(ChargifyError):
     pass
 
 
+class ChargifyDuplicateSubmissionError(ChargifyError):
+    pass
+
+
 class ChargifyUnprocessableEntityError(ChargifyError):
     pass
 
@@ -42,7 +52,17 @@ class ChargifyServerError(ChargifyError):
     pass
 
 
-# Maps certain function names to HTTP verbs
+# Map HTTP status codes to exceptions.
+STATUS_EXCEPTIONS = {
+    401: ChargifyUnauthorizedError,
+    403: ChargifyForbiddenError,
+    404: ChargifyNotFoundError,
+    409: ChargifyDuplicateSubmissionError,
+    422: ChargifyUnprocessableEntityError,
+    500: ChargifyServerError,
+}
+
+# Maps certain function names to HTTP verbs.
 VERBS = {
     'create': 'POST',
     'read': 'GET',
@@ -75,7 +95,6 @@ class ChargifyHttpClient(object):
     Extracted from the main Chargify class so it can be stubbed out during
     testing.
     """
-
     def make_request(self, url, method, params, data, api_key):
         """
         Actually responsible for making the HTTP request.
@@ -83,26 +102,19 @@ class ChargifyHttpClient(object):
         :param method: The HTTP method to use.
         :param data: Any POST data that should be included with the request.
         """
-        result = requests.request(url, method, params=params, json=data,
-                                  auth=(api_key, 'X'))
+        response = requests.request(method, url, params=params, json=data,
+                                    auth=(api_key, 'X'))
 
-        if result.ok:
-            if 'json' in result.headers.get('content-type'):
-                return result.json(), result.status_code
-            return result.text, result.status_code
+        if response.ok:
+            if 'json' in response.headers.get('content-type'):
+                return response.json()
+            return response.text
 
-        if result.status_code == 401:
-            raise ChargifyUnauthorizedError()
-        elif result.status_code == 403:
-            raise ChargifyForbiddenError()
-        elif result.status_code == 404:
-            raise ChargifyNotFoundError()
-        elif result.status_code == 422:
-            raise ChargifyUnprocessableEntityError()
-        elif result.status_code == 500:
-            raise ChargifyServerError()
-        else:
-            raise ChargifyError()
+        try:
+            exc_cls = STATUS_EXCEPTIONS[response.status_code]
+        except KeyError:
+            exc_cls = ChargifyError
+        raise exc_cls({'body': response.content})
 
 
 class Chargify(object):
@@ -123,7 +135,7 @@ class Chargify(object):
         :param sub_domain: The sub domain of your Chargify account.
         :param path: The current path constructed for this request.
         :param client: The HTTP client to use to make the request.
-        :param format: The desire response format for the request.
+        :param format: The desired response format for the request.
         """
         if format:
             msg = 'Format must be one of: ' + ', '.join(VALID_FORMATS)
