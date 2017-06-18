@@ -1,1 +1,1 @@
-from chargify import *
+from .chargify import *

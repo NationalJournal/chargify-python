@@ -71,14 +71,14 @@ class ChargifyHttpClient(object):
     testing.
     """
 
-    def make_request(self, method, url, params, data, api_key):
+    def make_request(self, url, method, params, data, api_key):
         """
         Actually responsible for making the HTTP request.
         :param url: The URL to load.
         :param method: The HTTP method to use.
         :param data: Any POST data that should be included with the request.
         """
-        result = requests.request(method, url, params=params, json=data,
+        result = requests.request(url, method, params=params, json=data,
                                   auth=(api_key, 'X'))
 
         if result.ok:
@@ -160,7 +160,9 @@ class Chargify(object):
         for identifier, name in IDENTIFIERS.items():
             value = kwargs.pop(identifier, None)
             if value:
-                path.append(str(value))
+                # Insert the identifier value into the URL immediately
+                # after the identifier.
+                path.insert(path.index(name) + 1, str(value))
 
         # Convert the data to a JSON string
         data = kwargs.pop('data', {})
@@ -169,9 +171,9 @@ class Chargify(object):
         url = self.domain % self.sub_domain
         url = url + '/'.join(path) + '.' + self.format.lower()
 
-        return method, url, kwargs, data
+        return url, method, kwargs, data
 
     def __call__(self, **kwargs):
-        method, url, params, data = self.construct_request(**kwargs)
-        return self.client.make_request(method, url, params, data,
+        url, method, params, data = self.construct_request(**kwargs)
+        return self.client.make_request(url, method, params, data,
                                         self.api_key)
