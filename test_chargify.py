@@ -1,6 +1,6 @@
 import unittest
 
-from chargify import Chargify
+from chargify import Chargify, ChargifyError
 
 
 class ChargifyHttpClientStub(object):
@@ -524,6 +524,12 @@ class TestCouponSubCodes(ChargifyTestCase):
             {},
             {}
         )
+
+
+class TestErrors(ChargifyTestCase):
+
+    def test_catchall(self):
+        assert ChargifyError()
 
 
 if __name__ == '__main__':
