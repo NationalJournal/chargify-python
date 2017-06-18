@@ -1,6 +1,8 @@
 # encoding: utf-8
 from setuptools import setup, find_packages
 
+import chargify
+
 
 with open('README.md') as f:
     readme = f.read()
@@ -10,16 +12,18 @@ with open('LICENSE') as f:
 
 
 requirements = [
-    'requests<3.0.0',
+    'requests>=2.5.0,<3.0.0',
 ]
 
 
 setup(
     name='chargify-python',
-    version='0.0.1',
+    version=chargify.__version__,
     long_description=readme,
     url='https://github.com/code-kitchen/chargify-python/',
     license=license,
+    author='Ben Tappin',
+    author_email='ben@codekitchen.io',
     install_requires=requirements,
     packages=find_packages(exclude=['test_*.py']),
     include_package_data=True,
@@ -37,5 +41,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     )
 )
