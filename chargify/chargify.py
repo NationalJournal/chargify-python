@@ -19,8 +19,9 @@ class ChargifyError(Exception):
     """
     Base Charfigy error exception.
     """
-    def __init__(self, error_data=None, *args, **kwargs):
+    def __init__(self, status_code=None, error_data=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.status_code = status_code
         self.error_data = error_data or {}
 
 
@@ -105,8 +106,10 @@ class ChargifyHttpClient(object):
         response = requests.request(method, url, params=params, json=data,
                                     auth=(api_key, 'X'))
 
+        is_json = 'json' in response.headers.get('content-type')
+
         if response.ok:
-            if 'json' in response.headers.get('content-type'):
+            if is_json:
                 return response.json()
             return response.text
 
@@ -114,7 +117,9 @@ class ChargifyHttpClient(object):
             exc_cls = STATUS_EXCEPTIONS[response.status_code]
         except KeyError:
             exc_cls = ChargifyError
-        raise exc_cls({'body': response.content})
+
+        error_data = response.json() if is_json else {'body': response.content}
+        raise exc_cls(status_code=response.status_code, error_data=error_data)
 
 
 class Chargify(object):
