@@ -82,9 +82,12 @@ IDENTIFIERS = {
     'statement_id': 'statements',
     'product_family_id': 'product_families',
     'coupon_id': 'coupons',
+    'code_id': 'codes',
     'transaction_id': 'transactions',
     'usage_id': 'usages',
     'migration_id': 'migrations',
+    'payment_profile_id': 'payment_profiles',
+    'invoice_id': 'invoices',
 }
 
 # Valid response formats

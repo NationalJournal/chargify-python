@@ -344,5 +344,187 @@ class TestTransactions(ChargifyTestCase):
         )
 
 
+class TestInvoices(ChargifyTestCase):
+
+    def test_construct_request(self):
+        # List all invoices
+        result = self.chargify.invoices()
+        self.assertResult(
+            result,
+            '/invoices.json',
+            'GET',
+            {},
+            {}
+        )
+
+        # Get a specific invoice
+        result = self.chargify.invoices(invoice_id=123)
+        self.assertResult(
+            result,
+            '/invoices/123.json',
+            'GET',
+            {},
+            {}
+        )
+
+
+class TestPaymentProfiles(ChargifyTestCase):
+
+    def test_construct_request(self):
+        # List all payment profiles
+        result = self.chargify.payment_profiles()
+        self.assertResult(
+            result,
+            '/payment_profiles.json',
+            'GET',
+            {},
+            {}
+        )
+
+        # Get a specific payment profile
+        result = self.chargify.payment_profiles(payment_profile_id=123)
+        self.assertResult(
+            result,
+            '/payment_profiles/123.json',
+            'GET',
+            {},
+            {}
+        )
+
+
+class TestCoupons(ChargifyTestCase):
+
+    def test_construct_request(self):
+        coupon = {
+            "coupon": {
+                "name": "15% off",
+                "code": "15OFF",
+                "description": "15% off",
+                "percentage": "20",
+                "allow_negative_balance": "false",
+                "recurring": "false",
+                "end_date": "2017-06-18T12:00:00+01:00",
+                "product_family_id": "9876"
+            }
+        }
+
+        # Create a new coupon
+        result = self.chargify.coupons.create(data=coupon)
+        self.assertResult(
+            result,
+            '/coupons.json',
+            'POST',
+            {},
+            {"coupon": {"allow_negative_balance": "false", "code": "15OFF", "name": "15% off", "end_date": "2017-06-18T12:00:00+01:00", "product_family_id": "9876", "percentage": "20", "recurring": "false", "description": "15% off"}}
+        )
+
+        # Retrieve a coupon by id
+        result = self.chargify.coupons(coupon_id='123')
+        self.assertResult(result, '/coupons/123.json', 'GET', {}, {})
+
+        # Find a specific coupon
+        result = self.chargify.coupons.find(code='15OFF')
+        self.assertResult(
+            result,
+            '/coupons/find.json',
+            'GET',
+            {'code': '15OFF'},
+            {}
+        )
+
+        # Validate a coupon code
+        result = self.chargify.coupons.validate(code='15OFF')
+        self.assertResult(
+            result,
+            '/coupons/validate.json',
+            'GET',
+            {'code': '15OFF'},
+            {}
+        )
+
+        # Validate a coupon code
+        result = self.chargify.coupons.validate(code='15OFF')
+        self.assertResult(
+            result,
+            '/coupons/validate.json',
+            'GET',
+            {'code': '15OFF'},
+            {}
+        )
+
+        # Add a coupon to a specific subscription
+        result = self.chargify.subscriptions.add_coupon.create(
+            subscription_id=123, code='15OFF')
+        self.assertResult(
+            result,
+            '/subscriptions/123/add_coupon.json',
+            'POST',
+            {'code': '15OFF'},
+            {}
+        )
+
+        # Remove a coupon from a subscription
+        result = self.chargify.subscriptions.remove_coupon.delete(
+            subscription_id=123)
+        self.assertResult(
+            result,
+            '/subscriptions/123/remove_coupon.json',
+            'DELETE',
+            {},
+            {}
+        )
+
+
+class TestCouponSubCodes(ChargifyTestCase):
+
+    def test_construct_request(self):
+        # Create new subcodes
+        result = self.chargify.coupons.codes.create(
+            coupon_id=123,
+            data={'codes': ['TEST1', 'TEST2']}
+        )
+        self.assertResult(
+            result,
+            '/coupons/123/codes.json',
+            'POST',
+            {},
+            {"codes": ["TEST1", "TEST2"]}
+        )
+
+        # Update existing subcodes
+        result = self.chargify.coupons.codes.update(
+            coupon_id=123,
+            data={'codes': ['TEST1', 'TEST3']}
+        )
+        self.assertResult(
+            result,
+            '/coupons/123/codes.json',
+            'PUT',
+            {},
+            {"codes": ["TEST1", "TEST3"]}
+        )
+
+        # Retrieve all subcodes
+        result = self.chargify.coupons.codes(coupon_id=123)
+        self.assertResult(
+            result,
+            '/coupons/123/codes.json',
+            'GET',
+            {},
+            {}
+        )
+
+        # Delete a subcode
+        result = self.chargify.coupons.codes.delete(coupon_id=123,
+                                                    code_id='TEST1')
+        self.assertResult(
+            result,
+            '/coupons/123/codes/TEST1.json',
+            'DELETE',
+            {},
+            {}
+        )
+
+
 if __name__ == '__main__':
     unittest.main()
