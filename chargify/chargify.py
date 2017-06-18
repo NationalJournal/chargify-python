@@ -20,7 +20,7 @@ class ChargifyError(Exception):
     Base Charfigy error exception.
     """
     def __init__(self, status_code=None, error_data=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(ChargifyError, self).__init__(*args, **kwargs)
         self.status_code = status_code
         self.error_data = error_data or {}
 
