@@ -1,19 +1,16 @@
-# encoding: utf-8
+from pip.req import parse_requirements
 from setuptools import setup, find_packages
 
 import chargify
 
+
+install_reqs = parse_requirements('requirements.txt', session='hack')
 
 with open('README.md') as f:
     readme = f.read()
 
 with open('LICENSE') as f:
     license = f.read()
-
-
-requirements = [
-    'requests>=2.5.0,<3.0.0',
-]
 
 
 setup(
@@ -24,7 +21,7 @@ setup(
     license=license,
     author='Ben Tappin',
     author_email='ben@codekitchen.io',
-    install_requires=requirements,
+    install_requires=install_reqs,
     packages=find_packages(exclude=['test_*.py']),
     include_package_data=True,
     zip_safe=False,
