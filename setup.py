@@ -20,7 +20,7 @@ setup(
     packages=find_packages(exclude=['test_*.py']),
     install_requires=[
         'requests',
-    ]
+    ],
     include_package_data=True,
     zip_safe=False,
     classifiers=[
