@@ -1,10 +1,6 @@
-from pip.req import parse_requirements
 from setuptools import setup, find_packages
 
 import chargify
-
-
-install_reqs = parse_requirements('requirements.txt', session='hack')
 
 with open('README.md') as f:
     readme = f.read()
@@ -21,11 +17,10 @@ setup(
     license=license,
     author='Ben Tappin',
     author_email='ben@codekitchen.io',
-    install_requires=install_reqs,
     packages=find_packages(exclude=['test_*.py']),
     include_package_data=True,
     zip_safe=False,
-    classifiers=(
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Natural Language :: English',
@@ -40,5 +35,5 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-    )
+    ]
 )
