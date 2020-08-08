@@ -2,6 +2,8 @@ from setuptools import setup, find_packages
 
 import chargify
 
+__version__ = '0.0.1'
+
 with open('README.md') as f:
     readme = f.read()
 
@@ -11,7 +13,7 @@ with open('LICENSE') as f:
 
 setup(
     name='chargify-python',
-    version=chargify.__version__,
+    version=__version__,
     long_description=readme,
     url='https://github.com/code-kitchen/chargify-python/',
     license=license,
