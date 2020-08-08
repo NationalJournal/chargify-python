@@ -1,20 +1,5 @@
 import requests
 
-
-__all__ = (
-    'ChargifyError',
-    'ChargifyConnectionError',
-    'ChargifyUnauthorizedError',
-    'ChargifyForbiddenError',
-    'ChargifyNotFoundError',
-    'ChargifyDuplicateSubmissionError',
-    'ChargifyUnprocessableEntityError',
-    'ChargifyServerError',
-    'ChargifyHttpClient',
-    'Chargify',
-)
-
-
 class ChargifyError(Exception):
     """
     Base Charfigy error exception.
@@ -110,7 +95,6 @@ class ChargifyHttpClient(object):
                                     auth=(api_key, 'X'))
 
         is_json = 'json' in response.headers.get('content-type')
-
         if response.ok:
             if is_json:
                 return response.json()
@@ -202,3 +186,29 @@ class Chargify(object):
         url, method, params, data = self.construct_request(**kwargs)
         return self.client.make_request(url, method, params, data,
                                         self.api_key)
+
+class ChargifyClient(object):
+    """
+    An actual pythonic and EXPLICIT client for the Chargify API.
+    """
+    api_key = ''
+    sub_domain = ''
+    domain = 'https://%s.chargify.com'
+    client = ChargifyHttpClient()
+
+    def __init__(self, api_key, sub_domain):
+        """
+        :param api_key: The API key for your Chargify account.
+        :param sub_domain: The sub domain of your Chargify account.
+        """
+        self.api_key = api_key
+        self.domain = self.domain % sub_domain
+
+    def get_management_link(self, customer_id):
+        """
+        endpoint: /portal/customers/{customer_id}/management_link.json
+        :param customer_id: get the Chargify Billing Portal Management Link for 
+        the given customer id. 
+        """
+        url = self.domain + f"/portal/customers/{customer_id}/management_link.json"
+        return self.client.make_request(url, "GET", None, None, self.api_key)
