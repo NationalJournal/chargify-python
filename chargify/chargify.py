@@ -212,3 +212,13 @@ class ChargifyClient(object):
         """
         url = self.domain + f"/portal/customers/{customer_id}/management_link.json"
         return self.client.make_request(url, "GET", None, None, self.api_key)
+
+    def api_request(self, path, method="GET", data=None):
+        """
+        Arbitrary chargify api request handler.
+        :param path: any chargify endpoint url.
+        :param method: method type GET, POST, etc
+        return: json
+        """
+        url = self.domain + path
+        return self.client.make_request(url, method, None, data, self.api_key)
