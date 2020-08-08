@@ -1,7 +1,5 @@
 from setuptools import setup, find_packages
 
-import chargify
-
 __version__ = '0.0.1'
 
 with open('README.md') as f:
