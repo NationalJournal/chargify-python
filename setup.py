@@ -19,7 +19,7 @@ setup(
     author_email='ben@codekitchen.io',
     packages=find_packages(exclude=['test_*.py']),
     install_requires=[
-        'requests>=2.22.0',
+        'requests>=2.20.0',
     ],
     include_package_data=True,
     zip_safe=False,
